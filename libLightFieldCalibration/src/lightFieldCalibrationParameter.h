@@ -46,6 +46,7 @@ typedef struct lfCalibrationParameter {
   lfPoint2D_t sub_grid_step;      ///< translation vector to the sub pattern with in one grid [lens]
   int sub_grid_nums;              ///< number of patterns wihtin one grid
   //eLenseArrangement_t lenseOrder;
+  std::vector<std::vector<lfPoint2D_t>> lens_centers; ///< all lens centers
 } lfCalibrationParameter_t;
 
 #endif //LIGHT_FIELD_CALIBRATION_H

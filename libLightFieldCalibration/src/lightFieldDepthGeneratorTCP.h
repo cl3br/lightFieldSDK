@@ -15,6 +15,6 @@ public:
   cLightFieldDepthGeneratorTCP() {};
   ~cLightFieldDepthGeneratorTCP() {};
 
-  virtual lfError generate(void* raw_image, lfCalibrationParameter_t* params, void* depthmap);
+  virtual lfError generate(void* raw_image, lfCalibrationParameter_t params);
 };
 #endif // LIGHT_FIELD_DEPTH_GENERATOR_H

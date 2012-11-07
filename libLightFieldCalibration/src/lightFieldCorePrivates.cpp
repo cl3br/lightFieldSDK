@@ -7,9 +7,12 @@
 #include "lightFieldCorePrivates.h"
 corePrivs::corePrivs()
 {
+  _img = NULL;
   _raw_img = NULL;
   _white_img = NULL;
   _proc_img = NULL;
+  _depth_generator = NULL;
+  _view_generator = NULL;
 
   _calib = new cLightFieldCalibration();
   _depth_generator_factory = new cLightFieldDepthGeneratorFactory();

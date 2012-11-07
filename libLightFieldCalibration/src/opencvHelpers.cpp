@@ -29,10 +29,12 @@ CvPoint2D64f transformPoint_inv(CvMat* M, CvPoint2D64f pi)
 }
 
 void showImage(IplImage* img, const char* name, int delay)
-{    
-    cvNamedWindow(name);
-    cvShowImage(name, img);
-    cvWaitKey(delay);
+{
+  IplImage* _img = cvCreateImage(cvSize(img->width, img->height), IPL_DEPTH_8U, img->nChannels);
+  cvConvert(img, _img);
+  cvNamedWindow(name);
+  cvShowImage(name, _img);
+  cvWaitKey(delay);
 }
 
 /**

@@ -48,8 +48,9 @@ inline lfPoint2D_t operator*(double f, lfPoint2D_t p) {
   po.y = f * p.y;
   return po;
 }
-
 #endif // __cplusplus
+
+typedef double lfTransMat2D_t[9];
 
 typedef enum {
   LF_CALIBRATION_FILE_RAYTRIX,

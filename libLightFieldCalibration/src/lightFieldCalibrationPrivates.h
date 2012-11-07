@@ -10,6 +10,7 @@
 
 #include "cv.h"
 #include <vector>
+#include "lfTypes.h"
 #include "lightFieldCalibrationFileReaderFactory.h"
 
 //      lens_type < number < lens_img > > >
@@ -32,9 +33,9 @@ struct calibPrivs
   IplImage* img;                    ///> raw light field image
   IplImage* imask;                  ///> image mask to determine lens pixels (1 - valid, 0 - invalid)
   IplImage* lmask;                  ///> lens mask to extract a lens image
-  vector<CvMat*> lensCenters;       ///> stores all the lens centers (channel 1: x, channel 2: y) [pixels] in img coords
+  //vector<CvMat*> lensCenters;       ///> stores all the lens centers (channel 1: x, channel 2: y) [pixels] in img coords
   lfImg_t   lensImages;             ///> all lense images
-  CvMat*    transMat;               ///> transforms from image to lens coordinate system
+  lfTransMat2D_t transMat;          ///> transforms from image to lens coordinate system
   lfCalibrationParameter_t params;  ///> stores all calibration parameter \sa lfCalibrationParameter_t
   cLightFieldCalibrationFileReaderFactory* reader_factory;
   

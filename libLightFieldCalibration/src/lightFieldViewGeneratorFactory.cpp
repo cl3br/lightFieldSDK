@@ -5,13 +5,13 @@
  */
 
 #include "lightFieldViewGeneratorFactory.h"
-//#include "lightFieldViewGeneratorRaytrix.h"
+#include "lightFieldViewGenerator_AllInFocus.h"
 
 cLightFieldViewGenerator* cLightFieldViewGeneratorFactory::create(lfViewGeneratorType_t type)
 {
   switch(type) {
   case LF_VIEW_GENERATOR_RAYTRIX:
-    return NULL; //TODO: new cLightFieldDepthGenerator();
+    return new cLightFieldViewGenerator_AllInFocus();
   case LF_VIEW_GENERATOR_UNKNOWN:
   default:
     return NULL;

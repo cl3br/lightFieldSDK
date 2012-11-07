@@ -16,6 +16,9 @@ public:
   cLightFieldViewGenerator() {};
   ~cLightFieldViewGenerator() {};
 
-  virtual lfError generate(void* raw_image, lfCalibrationParameter_t* params, void* view_image);
+  virtual lfError generate(void* raw_image, void* depth_image, lfCalibrationParameter_t params);
+  virtual void* getView() const {return _view;}
+protected:
+  void *_view;
 };
 #endif // LIGHT_FIELD_VIEW_GENERATOR_H

@@ -13,9 +13,12 @@
 class cLightFieldDepthGenerator {
 
 public:
-  cLightFieldDepthGenerator() {};
+  cLightFieldDepthGenerator() : _depthImage(NULL) {};
   ~cLightFieldDepthGenerator() {};
 
-  virtual lfError generate(void* raw_image, lfCalibrationParameter_t* params, void* depthmap);
+  virtual lfError generate(void* raw_image, lfCalibrationParameter_t params);
+  virtual void* getDepthImage() const {return _depthImage;}
+protected:
+  void* _depthImage;
 };
 #endif // LIGHT_FIELD_DEPTH_GENERATOR_H

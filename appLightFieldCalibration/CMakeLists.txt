@@ -11,6 +11,7 @@ link_directories(${OpenCV_LIB_DIR})
 
 # include project libs
 include_directories(../libLightFieldCalibration/src)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 file(GLOB SRC_FILES src/*.c*)
 file(GLOB HDR_FILES src/*.h*)

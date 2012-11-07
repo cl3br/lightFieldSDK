@@ -10,9 +10,8 @@
 #include "cv.h"
 #include "highgui.h"
 
+#include "lightFieldUtils.h"
 #include "opencvHelpers.h"
-#include "lightFieldCalibrationFileReader.h"
-#include "lightFieldCalibrationFileReaderFactory.h"
 #include "lightFieldCalibration.h"
 #include "lightFieldCalibrationPrivates.h"
 
@@ -33,6 +32,10 @@ cLightFieldCalibration::~cLightFieldCalibration()
   }
 }
 
+lfCalibrationParameter_t cLightFieldCalibration::getParameters()
+{
+  return p->params;
+}
 
 lfError cLightFieldCalibration::loadCalibration(const char* file_name, lfCalibrationFileType_t type)
 {
@@ -58,8 +61,8 @@ lfError cLightFieldCalibration::computeImageSpecificParams()
 
   computeTransMat();
 
-  CvPoint2D64f p0 = transformPoint_inv(p->transMat, cvPoint2D64f(0,0));
-  CvPoint2D64f p1 = transformPoint_inv(p->transMat, cvPoint2D64f(p->img->width,p->img->height));
+  lfPoint2D_t p0 = lfTransformPoint2D_inv(p->transMat, lfPoint2D(0,0));
+  lfPoint2D_t p1 = lfTransformPoint2D_inv(p->transMat, lfPoint2D(p->img->width,p->img->height));
   p->grid_min.x = (int) (min(p0.x, p1.x) * factor_x) - 1;
   p->grid_min.y = (int) (min(p0.y, p1.y) * factor_y) - 1;
   p->grid_max.x = (int) (max(p0.x, p1.x) * factor_x) + 1;
@@ -69,26 +72,6 @@ lfError cLightFieldCalibration::computeImageSpecificParams()
   p->numLenses = p->numX * p->numY * p->params.sub_grid_nums;
 
   //p->isImageNew = false;
-
-  RETURN_NO_ERR;
-}
-
-lfError cLightFieldCalibration::showCalibImage()
-{
-  IplImage* img = cvCloneImage(p->img);
-  drawLenses(img, 1, p->params.lensTypes);
-  showImage(img, "Calibration Debug Image");
-
-  RETURN_NO_ERR;
-}
-
-lfError cLightFieldCalibration::saveCalibImage(const char* file_name)
-{
-  IplImage* img = cvCloneImage(p->img);
-  RETURN_IF_FAILED(drawLenses(img, 1, p->params.lensTypes));
-
-  if(cvSaveImage(file_name, img) == 0)
-    return LF_ERR;
 
   RETURN_NO_ERR;
 }
@@ -166,29 +149,38 @@ lfError cLightFieldCalibration::rectify(void* img)
 {
   RETURN_IF_FAILED(computeTransMat());
 
-  cvWarpPerspective(p->img, img, p->transMat, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS+CV_WARP_INVERSE_MAP );
+  //cvWarpPerspective(p->img, img, p->transMat, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS+CV_WARP_INVERSE_MAP );
 
   RETURN_NO_ERR;
 }
 
 lfError cLightFieldCalibration::computeTransMat()
 {
-  if (p->transMat)
-    cvReleaseMat(&p->transMat);
+  //if (p->transMat)
+  //  cvReleaseMat(&p->transMat);
 
-  p->transMat = cvCreateMat(3, 3, CV_32FC1);
+  //p->transMat = cvCreateMat(3, 3, CV_32FC1);
   
   const double a_sin = sin(p->params.rotation);
   const double a_cos = cos(p->params.rotation);
-  cvSetReal2D(p->transMat, 0, 0, p->params.scale_x*a_cos);
-  cvSetReal2D(p->transMat, 0, 1,-p->params.scale_x*a_sin);
-  cvSetReal2D(p->transMat, 0, 2, p->params.offset.x);
-  cvSetReal2D(p->transMat, 1, 0, p->params.scale_y*a_sin);
-  cvSetReal2D(p->transMat, 1, 1, p->params.scale_y*a_cos);
-  cvSetReal2D(p->transMat, 1, 2, p->params.offset.y);
-  cvSetReal2D(p->transMat, 2, 0, 0.0); // TODO: perspective params?
-  cvSetReal2D(p->transMat, 2, 1, 0.0); // TODO: perspective params?
-  cvSetReal2D(p->transMat, 2, 2, 1.0);
+  //cvSetReal2D(p->transMat, 0, 0, p->params.scale_x*a_cos);
+  //cvSetReal2D(p->transMat, 0, 1,-p->params.scale_x*a_sin);
+  //cvSetReal2D(p->transMat, 0, 2, p->params.offset.x);
+  //cvSetReal2D(p->transMat, 1, 0, p->params.scale_y*a_sin);
+  //cvSetReal2D(p->transMat, 1, 1, p->params.scale_y*a_cos);
+  //cvSetReal2D(p->transMat, 1, 2, p->params.offset.y);
+  //cvSetReal2D(p->transMat, 2, 0, 0.0); // TODO: perspective params?
+  //cvSetReal2D(p->transMat, 2, 1, 0.0); // TODO: perspective params?
+  //cvSetReal2D(p->transMat, 2, 2, 1.0);
+  p->transMat[0] = p->params.scale_x*a_cos;
+  p->transMat[1] = -p->params.scale_x*a_sin;
+  p->transMat[2] =  p->params.offset.x;
+  p->transMat[3] =  p->params.scale_y*a_sin;
+  p->transMat[4] =  p->params.scale_y*a_cos;
+  p->transMat[5] =  p->params.offset.y;
+  p->transMat[6] =  0.0; // TODO: perspective params?
+  p->transMat[7] =  0.0; // TODO: perspective params?
+  p->transMat[8] =  1.0;
 
   RETURN_NO_ERR;
 }
@@ -199,8 +191,9 @@ lfError cLightFieldCalibration::computeLenseCenters()
   {
     const double d = p->params.diameter;
     lfPoint2D_t pointPattern;
-    CvPoint2D64f pointLens;
-    CvScalar s;
+    lfPoint2D_t pointLens;
+    //CvPoint2D64f* pointLensCV;
+    //CvScalar s;
 
     // allow up to 4 different lense types
     assert(p->params.lensTypes <= 4);
@@ -208,19 +201,14 @@ lfError cLightFieldCalibration::computeLenseCenters()
     // release all previous lens center matrices
     p->deleteLensCenters();
 
-//    if(p->isImageNew)
-      computeImageSpecificParams();
-    //else if(p->isCalibNew)
-    //  computeTransMat();
+    RETURN_IF_FAILED(computeImageSpecificParams());
 
     // create new matrices
     for(int l = 0; l < p->params.lensTypes; l++) {
-      CvMat* m = cvCreateMat(1, p->numLenses, CV_32FC2);
-      if(!m) {
-        p->deleteLensCenters();
-        return LF_ERR;
-      }
-      p->lensCenters.push_back(m);
+      /*CvMat* m = cvCreateMat(1, p->numLenses, CV_32FC2);*/
+      vector<lfPoint2D_t> vec;
+      p->params.lens_centers.push_back(vec);
+      p->params.lens_centers[l].reserve(p->numLenses);
     }
 
     const lfPoint2D_t subGridStep = d * p->params.sub_grid_step;
@@ -233,12 +221,15 @@ lfError cLightFieldCalibration::computeLenseCenters()
         for (int pat = 0; pat < p->params.sub_grid_nums; pat++) {
           for(int l = 0; l < p->params.lensTypes; l++)
           {
-            pointLens.x = pointPattern.x + p->params.lenses[l].offset.x * d;
-            pointLens.y = pointPattern.y + p->params.lenses[l].offset.y * d;
-            pointLens = transformPoint(p->transMat, pointLens);
-            s.val[0] = pointLens.x; s.val[1] = pointLens.y;
+            //pointLens.x = pointPattern.x + p->params.lenses[l].offset.x * d;
+            //pointLens.y = pointPattern.y + p->params.lenses[l].offset.y * d;
+            pointLens = pointPattern + (d * p->params.lenses[l].offset);
+
+            pointLens = lfTransformPoint2D(p->transMat, pointLens);
+            //s.val[0] = pointLens.x; s.val[1] = pointLens.y;
             assert(numLens < p->numLenses);
-            cvSet1D(p->lensCenters[l], numLens, s);
+            //cvSet1D(p->lensCenters[l], numLens, s);
+            p->params.lens_centers[l].push_back(pointLens);
           }
           pointPattern += subGridStep;
           numLens++;
@@ -254,17 +245,20 @@ lfError cLightFieldCalibration::drawLenses(void* img, int line_width, int colors
 {
   const int r = static_cast<int> (p->params.diameter / 2 - p->params.lens_border);
   CvScalar *color = new CvScalar[colors];
+  p->img = (IplImage*) img;
   for (int c=0; c < colors; c++) {
     color[c] = gColors[c%MY_CV_COLORS];
   }
-  CvScalar p1;
+  //CvScalar p1;
+  lfPoint2D_t p1;
   computeLenseCenters();
 
 #ifdef LENSE_VIS_CIRCLE
   for (int l=0; l < p->params.lensTypes; l++) {
     for (int i=0; i < p->numLenses; i++) {
-      p1 = cvGet1D(p->lensCenters[l], i);
-      cvDrawCircle(img, cvPoint((int) p1.val[0], (int) p1.val[1]), r, color[l%colors], line_width);
+      //p1 = cvGet1D(p->lensCenters[l], i);
+      p1 = p->params.lens_centers[l][i];
+      cvDrawCircle(img, cvPoint((int) p1.x/*val[0]*/, (int) p1.y/*val[1]*/), r, color[l%colors], line_width);
     }
   }
 #elif defined LENSE_VIS_LINES
@@ -394,17 +388,21 @@ lfError cLightFieldCalibration::extractLensImages()
 
 lfError cLightFieldCalibration::getLensImage(int lens_type, int lens_num, void* lens_img, bool useMask)
 {
-  if (p->lensCenters.empty())
+  if (p->params.lens_centers.empty())
     return LF_ERR;
 
   IplImage* img = (IplImage*) lens_img;
-  CvScalar lc;
+  //CvScalar lc;
+  lfPoint2D_t lc;
   CvRect roi;
   const int r = cvRound(p->params.diameter/2);
 
-  lc = cvGet1D(p->lensCenters[lens_type], lens_num);
-  roi.x = (int) lc.val[0] - r;
-  roi.y = (int) lc.val[1] - r;
+  //lc = cvGet1D(p->params.lens_centers[lens_type], lens_num);
+  lc = p->params.lens_centers[lens_type][lens_num];
+  //roi.x = (int) lc.val[0] - r;
+  //roi.y = (int) lc.val[1] - r;
+  roi.x = (int) lc.x - r;
+  roi.y = (int) lc.y - r;
   roi.height = p->lmask->height;
   roi.width = p->lmask->width;
   cvZero(img);

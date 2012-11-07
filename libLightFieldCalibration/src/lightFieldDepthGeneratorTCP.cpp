@@ -5,15 +5,18 @@
  */
 
 #include "cv.h"
+#include "opencvHelpers.h"
 #include "lfError.h"
 #include "lightFieldDepthGeneratorTCP.h"
 
-lfError cLightFieldDepthGeneratorTCP::generate(void* raw_image, lfCalibrationParameter_t* params, void* depth_map)
+lfError cLightFieldDepthGeneratorTCP::generate(void* raw_image, lfCalibrationParameter_t params)
 {
-  static_cast<IplImage*> (raw_image);
-  IplImage* depth = static_cast<IplImage*> (depth_map);
+  IplImage* img = static_cast<IplImage*> (raw_image);
+  IplImage* depth = CREATE_IMAGE(img);
+  RETURN_IF_NULL(depth);
 
-  cvSet(depth, cvScalarAll(params->tcp));
+  cvSet(depth, cvScalarAll(params.tcp));
+  _depthImage = depth;
 
   RETURN_NO_ERR;
 }

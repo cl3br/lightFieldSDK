@@ -23,10 +23,14 @@ struct corePrivs
   void deleteWhiteImage();
   void deleteProcImage();
 
+  IplImage* _img;
   IplImage* _raw_img;
   IplImage* _white_img;
   IplImage* _proc_img;
+
   cLightFieldCalibration* _calib;
+  cLightFieldDepthGenerator* _depth_generator;
+  cLightFieldViewGenerator* _view_generator;
   cLightFieldDepthGeneratorFactory* _depth_generator_factory;
   cLightFieldViewGeneratorFactory* _view_generator_factory;
 

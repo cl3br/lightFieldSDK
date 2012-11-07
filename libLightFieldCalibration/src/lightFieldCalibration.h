@@ -8,6 +8,7 @@
 #define LIGHT_FIELD_CALIBRATION_H
 
 #include "lfError.h"
+#include "lightFieldCalibrationParameter.h"
 
 struct calibPrivs;
 
@@ -29,17 +30,6 @@ public:
    */
   lfError loadCalibration(const char* file_name, lfCalibrationFileType_t type);
   /**
-   * Shows the input image with little circles to vizualize the micro lenses.
-   * \return 0 on success and nonzero on failure
-   */
-  lfError showCalibImage();
-  /**
-   * Saves the calibration image to disc.
-   * \param file_name Path to store the image on disc. Format will be recognized automatically.
-   * \return 0 on success and nonzero on failure
-   */
-  lfError saveCalibImage(const char* file_name);
-  /**
    * Shows the rectified image.
    * \return 0 on success and nonzero on failure
    */
@@ -59,6 +49,15 @@ public:
   lfError showCenterImage();
   lfError extractLensImages();
 
+  /**
+   * Get all parameters from the calibration configuration.
+   * \return 0 on success and nonzero on failure
+   */
+  lfCalibrationParameter getParameters();
+
+
+  lfError drawLenses(void* img, int line_width, int colors);  // draws lines / circles as lens visualization
+
   //enum eImageRectification {
   //  RECTIFY_AFFINE=2,        ///> use affine transformation for image rectification
   //  RECTIFY_PERSPECTIVE    ///> use affine transformation for image rectification
@@ -69,7 +68,6 @@ private:
   lfError computeTransMat();      // compute the transformation matrix according to eImageRectification
   lfError computeImageSpecificParams(); // should be called after image and calibration files are loaded
   lfError computeCenterImage(void* img);
-  lfError drawLenses(void* img, int line_width, int colors);  // draws lines / circles as lens visualization
   lfError rectify(void* img);
   lfError createImageMask();       // creates a mask containing the valid lens pixels
   lfError createLensMask();       // creates a mask containing the valid lens pixels
