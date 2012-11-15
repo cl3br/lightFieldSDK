@@ -6,7 +6,7 @@
 
 #include "lightFieldDepthGenerator.h"
 
-lfError cLightFieldDepthGenerator::generate(void* raw_image, lfCalibrationParameter_t params)
+lfError cLightFieldDepthGenerator::generate(void* raw_image, lfDepthGeneratorParameter_t* params)
 {
   return LF_ERR;
 }

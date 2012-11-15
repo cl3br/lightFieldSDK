@@ -13,10 +13,10 @@
 class cLightFieldViewGenerator {
 
 public:
-  cLightFieldViewGenerator() {};
+  cLightFieldViewGenerator() : _view(NULL) {};
   ~cLightFieldViewGenerator() {};
 
-  virtual lfError generate(void* raw_image, void* depth_image, lfCalibrationParameter_t params);
+  virtual lfError generate(void* raw_image, void* depth_image, lfCalibrationParameter_t *params);
   virtual void* getView() const {return _view;}
 protected:
   void *_view;

@@ -13,37 +13,74 @@
 typedef struct {
   double x;
   double y;
-} lfPoint2D_t;
+} lfPoint2Dd_t;
+
+typedef struct {
+  int x;
+  int y;
+} lfPoint2Di_t;
 
 #ifdef __cplusplus
 
-inline lfPoint2D_t lfPoint2D(double x, double y) {
-  lfPoint2D_t p;
+inline lfPoint2Dd_t lfPoint2D(double x, double y) {
+  lfPoint2Dd_t p;
   p.x = x; p.y = y;
   return p;
 }
 
-inline lfPoint2D_t operator+(lfPoint2D_t p1, lfPoint2D_t p2) {
-  lfPoint2D_t p;
+inline lfPoint2Di_t lfPoint2Di(int x, int y) {
+  lfPoint2Di_t p;
+  p.x = x; p.y = y;
+  return p;
+}
+
+inline lfPoint2Dd_t operator+(lfPoint2Dd_t p1, lfPoint2Dd_t p2) {
+  lfPoint2Dd_t p;
   p.x = p1.x + p2.x;
   p.y = p1.y + p2.y;
   return p;
 }
 
-inline void operator+=(lfPoint2D_t &p1, lfPoint2D_t p2) {
+inline lfPoint2Di_t operator+(lfPoint2Di_t p1, lfPoint2Di_t p2) {
+  lfPoint2Di_t p;
+  p.x = p1.x + p2.x;
+  p.y = p1.y + p2.y;
+  return p;
+}
+
+inline lfPoint2Dd_t operator-(lfPoint2Dd_t p1, lfPoint2Dd_t p2) {
+  lfPoint2Dd_t p;
+  p.x = p1.x - p2.x;
+  p.y = p1.y - p2.y;
+  return p;
+}
+
+inline lfPoint2Di_t operator-(lfPoint2Di_t p1, lfPoint2Di_t p2) {
+  lfPoint2Di_t p;
+  p.x = p1.x - p2.x;
+  p.y = p1.y - p2.y;
+  return p;
+}
+
+inline void operator+=(lfPoint2Dd_t &p1, lfPoint2Dd_t p2) {
   p1.x = p1.x + p2.x;
   p1.y = p1.y + p2.y;
 }
 
-inline lfPoint2D_t operator*(lfPoint2D_t p1, lfPoint2D_t p2) {
-  lfPoint2D_t p;
+inline void operator+=(lfPoint2Di_t &p1, lfPoint2Di_t p2) {
+  p1.x = p1.x + p2.x;
+  p1.y = p1.y + p2.y;
+}
+
+inline lfPoint2Dd_t operator*(lfPoint2Dd_t p1, lfPoint2Dd_t p2) {
+  lfPoint2Dd_t p;
   p.x = p1.x * p2.x;
   p.y = p1.y * p2.y;
   return p;
 }
 
-inline lfPoint2D_t operator*(double f, lfPoint2D_t p) {
-  lfPoint2D_t po;
+inline lfPoint2Dd_t operator*(double f, lfPoint2Dd_t p) {
+  lfPoint2Dd_t po;
   po.x = f * p.x;
   po.y = f * p.y;
   return po;
@@ -58,7 +95,8 @@ typedef enum {
 } lfCalibrationFileType_t;
 
 typedef enum {
-  LF_DEPTH_GENERATOR_TCP,
+  LF_DEPTH_GENERATOR_PLANE,
+  LF_DEPTH_GENERATOR_FILE,
   LF_DEPTH_GENERATOR_UNKNOWN
 } lfDepthGeneratorType_t;
 

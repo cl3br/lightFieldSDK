@@ -1,11 +1,12 @@
+#include "math.h"
 #include "lightFieldUtils.h"
 
 // Macros
 #define LF_DELETE(p) if(p) { delete p; p = NULL;}
 
-lfPoint2D_t lfTransformPoint2D(lfTransMat2D_t M, lfPoint2D_t pi)
+lfPoint2Dd_t lfTransformPoint2D(lfTransMat2D_t M, lfPoint2Dd_t pi)
 {
-  lfPoint2D_t po;
+  lfPoint2Dd_t po;
   
   po.x = M[0] * pi.x + M[1] * pi.y + M[2];
   po.y = M[3] * pi.x + M[4] * pi.y + M[5];
@@ -37,12 +38,17 @@ void invertMatrix(lfTransMat2D_t M, lfTransMat2D_t M_inv)
   M_inv[8] = inv_det * (M[0] * M[4] - M[1] * M[3]);
 }
 
-lfPoint2D_t lfTransformPoint2D_inv(lfTransMat2D_t M, lfPoint2D_t pi)
+lfPoint2Dd_t lfTransformPoint2D_inv(lfTransMat2D_t M, lfPoint2Dd_t pi)
 {
-  lfPoint2D_t po;
+  lfPoint2Dd_t po;
   lfTransMat2D_t invM;
   invertMatrix(M, invM);
 
   po = lfTransformPoint2D(invM, pi);    
   return po;
+}
+
+double abs(lfPoint2Dd_t p)
+{
+  return sqrt(p.x*p.x + p.y*p.y);
 }

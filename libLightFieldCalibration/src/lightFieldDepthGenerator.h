@@ -8,6 +8,7 @@
 #define LIGHT_FIELD_DEPTH_GENERATOR_H
 
 #include "lfError.h"
+#include "lightFieldDepthGeneratorParameter.h"
 #include "lightFieldCalibrationParameter.h"
 
 class cLightFieldDepthGenerator {
@@ -16,7 +17,7 @@ public:
   cLightFieldDepthGenerator() : _depthImage(NULL) {};
   ~cLightFieldDepthGenerator() {};
 
-  virtual lfError generate(void* raw_image, lfCalibrationParameter_t params);
+  virtual lfError generate(void* raw_image, lfDepthGeneratorParameter_t *params);
   virtual void* getDepthImage() const {return _depthImage;}
 protected:
   void* _depthImage;

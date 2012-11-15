@@ -12,9 +12,13 @@
 class cLightFieldViewGenerator_AllInFocus : public cLightFieldViewGenerator {
 
 public:
-  //cLightFieldViewGenerator() {};
+  cLightFieldViewGenerator_AllInFocus() : cLightFieldViewGenerator(), _lens_mask(NULL) {};
   //~cLightFieldViewGenerator() {};
 
-  virtual lfError generate(void* raw_image, void* depth_image, lfCalibrationParameter_t params);
+  virtual lfError generate(void* raw_image, void* depth_image, lfCalibrationParameter_t *params);
+
+private:
+  //lfError createLensMask(const double d, const double rot);
+  void* _lens_mask;
 };
 #endif // LIGHT_FIELD_VIEW_GENERATOR_ALLINFOCUS_H

@@ -7,12 +7,18 @@
 #ifndef LIGHT_FIELD_CORE_PRIVS_H
 #define LIGHT_FIELD_CORE_PRIVS_H
 
+#include <vector>
 #include "cv.h"
 
 #include "lfTypes.h"
 #include "lightFieldCalibration.h"
 #include "lightFieldDepthGeneratorFactory.h"
 #include "lightFieldViewGeneratorFactory.h"
+
+using namespace std;
+
+//      lens_type < number < lens_img > > >
+typedef vector< vector< IplImage* > > lfImg_t;
 
 struct corePrivs
 {
@@ -22,6 +28,7 @@ struct corePrivs
   void deleteRawImage();
   void deleteWhiteImage();
   void deleteProcImage();
+  void deleteLensImages();
 
   IplImage* _img;
   IplImage* _raw_img;
@@ -37,6 +44,8 @@ struct corePrivs
   lfCalibrationFileType_t _calib_type;
   lfDepthGeneratorType_t _depth_gen_type;
   lfViewGeneratorType_t _view_gen_type;
+  
+  lfImg_t _lensImages;             ///> all lense images
 
   bool isImageNew;
 };

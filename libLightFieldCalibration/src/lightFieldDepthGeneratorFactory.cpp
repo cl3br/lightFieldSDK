@@ -5,13 +5,16 @@
  */
 
 #include "lightFieldDepthGeneratorFactory.h"
-#include "lightFieldDepthGeneratorTCP.h"
+#include "lightFieldDepthGeneratorPlane.h"
+#include "lightFieldDepthGeneratorFile.h"
 
 cLightFieldDepthGenerator* cLightFieldDepthGeneratorFactory::create(lfDepthGeneratorType_t type)
 {
   switch(type) {
-  case LF_DEPTH_GENERATOR_TCP:
-    return new cLightFieldDepthGeneratorTCP();
+  case LF_DEPTH_GENERATOR_PLANE:
+    return new cLightFieldDepthGeneratorPlane();
+  case LF_DEPTH_GENERATOR_FILE:
+    return new cLightFieldDepthGeneratorFile();
   case LF_DEPTH_GENERATOR_UNKNOWN:
   default:
     return NULL;

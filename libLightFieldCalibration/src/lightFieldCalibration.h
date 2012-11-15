@@ -53,10 +53,11 @@ public:
    * Get all parameters from the calibration configuration.
    * \return 0 on success and nonzero on failure
    */
-  lfCalibrationParameter getParameters();
-
+  lfCalibrationParameter getParameters(void *img);
 
   lfError drawLenses(void* img, int line_width, int colors);  // draws lines / circles as lens visualization
+  
+  
 
   //enum eImageRectification {
   //  RECTIFY_AFFINE=2,        ///> use affine transformation for image rectification

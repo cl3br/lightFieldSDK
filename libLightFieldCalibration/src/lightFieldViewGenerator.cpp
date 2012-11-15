@@ -6,7 +6,7 @@
 
 #include "lightFieldViewGenerator.h"
 
-lfError cLightFieldViewGenerator::generate(void *raw_image, void *depth_image, lfCalibrationParameter_t params)
+lfError cLightFieldViewGenerator::generate(void *raw_image, void *depth_image, lfCalibrationParameter_t* params)
 {
   return LF_ERR;
 }

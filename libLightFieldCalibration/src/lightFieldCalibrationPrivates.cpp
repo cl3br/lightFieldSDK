@@ -3,8 +3,10 @@
  * \author Clemens Brummer
  * \date   03.11.2012
  */
-
+#include <vector>
 #include "lightFieldCalibrationPrivates.h"
+
+using namespace std;
 
 calibPrivs::calibPrivs() {
   img      = NULL;
@@ -13,38 +15,46 @@ calibPrivs::calibPrivs() {
 
   reader_factory = new cLightFieldCalibrationFileReaderFactory();
 
-  params.offset.x = 58.0;
-  params.offset.y = 24.0;
-  params.rotation = -0.0065;
-  params.diameter = 28.0;
-  params.scale_x = 1.0015;
-  params.scale_y = 0.996;
-  params.sub_grid_nums = 1;
-  params.tcp = 2.0;
+  //params.offset.x = 58.0;
+  //params.offset.y = 24.0;
+  //params.rotation = -0.0065;
+  //params.diameter = 28.0;
+  //params.scale_x = 1.0015;
+  //params.scale_y = 0.996;
+  //params.sub_grid_nums = 1;
+  //params.tcp = 2.0;
+  //params.numX = 58;
+  //params.numY = 133;
   
   // default parameter
-  //params->diameter = 10;
-  //params->grid_step = lfPoint2D(1.0,1.0);
-  //lfLens_t lens;
-  //lens.depth_range_min = 1;
-  //lens.depth_range_max = 3;
-  //lens.offset = lfPoint2D(0,0);
-  //params->lenses.clear();
-  //params->lenses.push_back(lens);
-  //params->lensTypes = 1;
-  //params->lens_border = 0;
-  //params->offset = lfPoint2D(0,0);
-  //params->rotation = 0;
-  //params->scale_x = 1.0;
-  //params->scale_y = 1.0;
-  //params->step_x = lfPoint2D(1.0,0);
-  //params->step_y = lfPoint2D(0,1.0);
-  //params->sub_grid_nums = 1;
-  //params->tcp = 1.0;
-
-  numX = 58;
-  numY = 133;
-  //lenseArrStyle = LENSE_ARR_HEXA;
+  params.diameter = 10;
+  params.offset = lfPoint2D(0,0);
+  params.rotation = 0;
+  params.tcp = 1.0;
+  lfLens_t lens;
+  lens.depth_range_min = 1;
+  lens.depth_range_max = 3;
+  lens.offset = lfPoint2D(0,0);
+  params.lens_types.clear();
+  params.lens_types.push_back(lens);
+  params.lens_type_nums = 1;
+  params.lens_border = 0;
+  params.grid_step = lfPoint2D(1.0,1.0);
+  params.scale_x = 1.0;
+  params.scale_y = 1.0;
+  params.step_x = lfPoint2D(1.0,0);
+  params.step_y = lfPoint2D(0,1.0);
+  params.sub_grid_step = lfPoint2D(1.0,1.0);
+  params.sub_grid_nums = 1;
+  params.numLenses = 100;
+  params.numX = 10;
+  params.numY = 10;
+  params.grid_min = lfPoint2Di(-4,-4);
+  params.grid_max = lfPoint2Di(5,5);
+  memset(&params.transMat,0,sizeof(lfTransMat2D_t));
+  params.transMat[0]=1.0;
+  params.transMat[4]=1.0;
+  params.transMat[8]=1.0;
 
   isCalibNew = true;
 }
@@ -57,7 +67,6 @@ void calibPrivs::cleanUp() {
   deleteImage();
   deleteIMask();
   deleteLMask();
-  deleteLensImages();
   deleteLensCenters();
   if(reader_factory) {
     delete reader_factory;
@@ -87,22 +96,9 @@ void calibPrivs::deleteLMask() {
 }
 
 void calibPrivs::deleteLensCenters() {    
-  for(vector<vector<lfPoint2D_t>>::iterator it = params.lens_centers.begin(); it != params.lens_centers.end(); it++)
+  for(vector<vector<lfPoint2Dd_t>>::iterator it = params.lens_centers.begin(); it != params.lens_centers.end(); it++)
   {
     (*it).clear();
   }
   params.lens_centers.clear();
-}
-
-void calibPrivs::deleteLensImages() {
-  for(lfImg_t::iterator l = lensImages.begin(); l != lensImages.end(); l++)
-  {    
-    for(vector<IplImage*>::iterator it = (*l).begin(); it != (*l).end(); it++)
-    {
-      if (*it)
-        cvReleaseImage(&(*it)); *it = NULL;
-    }
-    (*l).clear();
-  }
-  lensImages.clear();
 }

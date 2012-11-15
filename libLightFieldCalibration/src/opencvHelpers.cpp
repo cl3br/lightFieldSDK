@@ -2,6 +2,7 @@
 #include "opencvHelpers.h"
 
 #define LOG cout
+using namespace std;
 
 /// po = T * pi;
 CvPoint2D64f transformPoint(CvMat* M, CvPoint2D64f pi)
@@ -32,9 +33,11 @@ void showImage(IplImage* img, const char* name, int delay)
 {
   IplImage* _img = cvCreateImage(cvSize(img->width, img->height), IPL_DEPTH_8U, img->nChannels);
   cvConvert(img, _img);
-  cvNamedWindow(name);
+  cvNamedWindow(name,0);
   cvShowImage(name, _img);
   cvWaitKey(delay);
+  cvReleaseImage(&_img);
+  cvDestroyWindow(name);
 }
 
 /**

@@ -10,7 +10,8 @@
 // MACROS
 #define CREATE_IMAGE(i) cvCreateImage(cvSize(i->width, i->height), i->depth, i->nChannels)
 #define CREATE_MAT(m) cvCreateMat(m->rows, m->cols, m->type)
-#define DELETE_IMAGE(i) if (i) { cvReleaseImage(&i); i = NULL; }
+#define DELETE_IMAGE(i) if (i) { cvReleaseImage((IplImage**)&i); i = NULL; }
+#define IS_POINT_IN_IMAGE(img,x,y) ((x) >= 0 && (y) >= 0 && (x) < (img)->width && (y) < (img)->height)
 
 // colors
 
@@ -51,4 +52,33 @@ void print3ChannelVectorMatrix(CvMat* M, int nChannels);
 void printVectorMatrixToFile(CvMat* M, int nChannels, const char* file_name);
 
 #undef LOG
+
+#ifdef __cplusplus
+inline CvScalar operator+(CvScalar s1, CvScalar s2)
+{
+  CvScalar s;
+  for(int i=0; i<4; i++)
+    s.val[i] = s1.val[i] + s2.val[i];
+
+  return s;
+}
+
+inline CvScalar operator*(double s1, CvScalar s2)
+{
+  CvScalar s;
+  for(int i=0; i<4; i++)
+    s.val[i] = s1 * s2.val[i];
+
+  return s;
+}
+
+inline CvScalar operator*(CvScalar s1, CvScalar s2)
+{
+  CvScalar s;
+  for(int i=0; i<4; i++)
+    s.val[i] = s1.val[i] * s2.val[i];
+
+  return s;
+}
+#endif
 #endif // OPENCV_HELPERS_H

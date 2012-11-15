@@ -37,6 +37,9 @@ corePrivs::~corePrivs()
 void corePrivs::cleanUp()
 {
   deleteRawImage();
+  deleteWhiteImage();
+  deleteProcImage();
+  deleteLensImages();
 }
 
 void corePrivs::deleteRawImage()
@@ -52,4 +55,17 @@ void corePrivs::deleteWhiteImage()
 void corePrivs::deleteProcImage()
 {
   DELETE_IMAGE(_proc_img);
+}
+
+void corePrivs::deleteLensImages() {
+  for(lfImg_t::iterator l = _lensImages.begin(); l != _lensImages.end(); l++)
+  {    
+    for(vector<IplImage*>::iterator it = (*l).begin(); it != (*l).end(); it++)
+    {
+      if (*it)
+        cvReleaseImage(&(*it)); *it = NULL;
+    }
+    (*l).clear();
+  }
+  _lensImages.clear();
 }

@@ -43,7 +43,7 @@ lfError cLightFieldCalibrationFileReaderRaytrix::read(const char *file_name, lfC
   params->scale_y = -1.0;
   params->sub_grid_nums = 2;
 
-  params->lenses.clear();
+  params->lens_types.clear();
 
   XMLElement* lens_type = root->FirstChildElement("lens_type");
   XMLElement* depth_range = NULL;
@@ -60,10 +60,10 @@ lfError cLightFieldCalibrationFileReaderRaytrix::read(const char *file_name, lfC
     XML2DOUBLE(depth_range, "min", l.depth_range_min);
     XML2DOUBLE(depth_range, "max", l.depth_range_max);
 
-    params->lenses.push_back(l);
+    params->lens_types.push_back(l);
   }
   
-  params->lensTypes = params->lenses.size();
+  params->lens_type_nums = params->lens_types.size();
 
   delete xml;
   RETURN_NO_ERR;
