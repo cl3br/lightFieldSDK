@@ -4,6 +4,19 @@
 #define LOG cout
 using namespace std;
 
+CvScalar get2DInterpolated(CvArr* arr, double x, double y)
+{
+  const int x1 = cvFloor(x);
+  const int x2 = cvCeil(x);
+  const int y1 = cvFloor(y);
+  const int y2 = cvCeil(y);
+  return  (x2-x) * (y2-y) * cvGet2D(arr, y1, x1) + \
+          (x-x1) * (y2-y) * cvGet2D(arr, y1, x2) + \
+          (x2-x) * (y-y1) * cvGet2D(arr, y2, x1) + \
+          (x-x1) * (y-y1) * cvGet2D(arr, y2, x2);  
+}
+
+
 /// po = T * pi;
 CvPoint2D64f transformPoint(CvMat* M, CvPoint2D64f pi)
 {

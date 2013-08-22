@@ -42,7 +42,7 @@ typedef struct lfCalibrationParameter {
   double scale_x;                     ///< x scale factor
   double scale_y;                     ///< y scale factor
   double rotation;                    ///< rotation between image sensor and microlense array [rad]
-  double diameter;                    ///< radius of the microlenses [pixel]
+  double diameter;                    ///< diameter of the microlenses [pixel]
   double lens_border;                 ///< [pixel]
   double tcp;                         ///< total covering plane [virtual depth]
   std::vector<lfLens_t> lens_types;   ///< array of lens types

@@ -231,7 +231,7 @@ lfError cLightFieldCalibration::computeLenseCenters()
 }
 
 lfError cLightFieldCalibration::drawLenses(void* img, int line_width, int colors)
-{
+{  
   const int r = static_cast<int> (p->params.diameter / 2 - p->params.lens_border);
   CvScalar *color = new CvScalar[colors];
   p->img = (IplImage*) img;

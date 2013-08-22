@@ -1,5 +1,5 @@
 /**
- * \file   lfCalibrationParameter.h
+ * \file   lightFieldDepthParameter.h
  * \author Clemens Brummer
  * \date   13.11.2012
  */

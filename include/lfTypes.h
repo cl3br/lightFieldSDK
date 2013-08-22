@@ -91,6 +91,7 @@ typedef double lfTransMat2D_t[9];
 
 typedef enum {
   LF_CALIBRATION_FILE_RAYTRIX,
+  LF_CALIBRATION_FILE_LYTRO,
   LF_CALIBRATION_FILE_UNKNOWN
 } lfCalibrationFileType_t;
 
@@ -102,6 +103,7 @@ typedef enum {
 
 typedef enum {
   LF_VIEW_GENERATOR_RAYTRIX,
+  LF_VIEW_GENERATOR_SPARSE,
   LF_VIEW_GENERATOR_UNKNOWN
 } lfViewGeneratorType_t;
 

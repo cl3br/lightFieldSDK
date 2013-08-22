@@ -10,8 +10,8 @@
 #include "lightFieldUtils.h"
 #include "lightFieldCalibrationParameter.h"
 
-#define LENS_MASK_HEXAGON
-//#define LENS_MASK_CIRCLE
+//#define LENS_MASK_HEXAGON
+#define LENS_MASK_CIRCLE
 //#define LENS_MASK_SQUARE
 
 using namespace std;
@@ -120,7 +120,7 @@ void* lfCalibrationParameter::createLensMask()
 
   cvFillConvexPoly(lens_mask, pts, 6, cvScalar(MY_CV_WHITE));
 #elif defined LENS_MASK_CIRCLE
-  cvCircle(lens_mask, cvPoint(lens_mask->width/2, lens_mask->height/2), (int) diameter/2, cvScalar(MY_CV_WHITE), -1);
+  cvCircle(lens_mask, cvPoint(lens_mask->width/2, lens_mask->height/2), (int) diameter/2 - lens_border, cvScalar(MY_CV_WHITE), -1);
 #elif defined LENS_MASK_SQUARE
   int r = (int) diameter/2;
   cvRectangle(lens_mask, cvPoint(lens_mask->width/2-r, lens_mask->height/2-r), cvPoint(lens_mask->width/2+r, lens_mask->height/2+r), cvScalar(MY_CV_WHITE),-1);

@@ -1,5 +1,5 @@
 /**
- * \file   lightFieldViewGenerator.h
+ * \file   lightFieldViewGenerator_AllInFocus.h
  * \author Clemens Brummer
  * \date   01.11.2012
  */
@@ -15,10 +15,9 @@ public:
   cLightFieldViewGenerator_AllInFocus() : cLightFieldViewGenerator(), _lens_mask(NULL) {};
   //~cLightFieldViewGenerator() {};
 
-  virtual lfError generate(void* raw_image, void* depth_image, lfCalibrationParameter_t *params);
+  virtual lfError generate(void *raw_image, void *depth_image, lfCalibrationParameter_t* cparams, lfViewGeneratorParameter_t* vparams);
 
 private:
-  //lfError createLensMask(const double d, const double rot);
   void* _lens_mask;
 };
 #endif // LIGHT_FIELD_VIEW_GENERATOR_ALLINFOCUS_H

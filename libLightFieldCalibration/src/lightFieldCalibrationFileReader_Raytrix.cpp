@@ -35,7 +35,7 @@ lfError cLightFieldCalibrationFileReaderRaytrix::read(const char *file_name, lfC
   XML2POINT(root, "lens_base_y", params->step_y);
   XML2POINT(root, "sub_grid_base", params->grid_step);
 
-  // raytrix patterns have only to patterns in one grid
+  // raytrix patterns have only two patterns in one grid
   params->sub_grid_step.x = params->grid_step.x / 2;
   params->sub_grid_step.y = params->grid_step.y / 2;
 

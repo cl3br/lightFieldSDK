@@ -10,6 +10,7 @@
 #include "lfTypes.h"
 #include "lfError.h"
 #include "lightFieldDepthGeneratorParameter.h"
+#include "lightFieldViewGeneratorParameter.h"
 
 struct corePrivs;
 
@@ -37,7 +38,7 @@ public:
    * \param file_name Path of the image file
    * \return LF_NO_ERR on success and LF_ERR on failure
    */
-  lfError loadWhiteImage(const char* file_name);
+  lfError loadWhiteImage(const char* file_name, const char* proc_file_name = NULL);
   /**
    * Loads an processed light field image from disc.
    * \param file_name Path of the image file
@@ -75,14 +76,14 @@ public:
    */
   lfError saveCalibImage(const char* file_name);
   
-  lfError saveLensImages(const char* folder_name);
+  lfError saveLensImages(const char* folder_name, bool from_depth_image=false);
 private:
   void* loadImage(const char* file_name);
   lfError saveImage(const char* file_name, void* img);
   void* createCalibImage();
   lfError createDepthImage(lfDepthGeneratorType_t type, lfDepthGeneratorParameter* params);
   lfError renderView(lfViewGeneratorType_t type);
-  lfError filterImage();
+  lfError filterImage(const char* file_name = NULL);
   lfError extractLensImages(void* img);
   lfError getLensImage(int lens_num, int lens_type, const void* calib_params, void* full_img, void* mask_img, void* lens_img);
 

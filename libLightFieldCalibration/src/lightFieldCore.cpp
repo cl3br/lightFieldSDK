@@ -66,7 +66,6 @@ lfError cLightFieldCore::loadRawImage(const char* file_name)
     p->_img = p->_raw_img;
     if(p->_white_img) {
       RETURN_IF_FAILED(filterImage());
-      p->_img = p->_proc_img;
     }
   }
   
@@ -74,12 +73,12 @@ lfError cLightFieldCore::loadRawImage(const char* file_name)
   RETURN_NO_ERR;
 }
 
-lfError cLightFieldCore::loadWhiteImage(const char* file_name)
+lfError cLightFieldCore::loadWhiteImage(const char* file_name, const char* proc_file_name)
 {
   p->deleteWhiteImage();
   p->_white_img = (IplImage*) loadImage(file_name);
   if(p->_raw_img && p->_white_img)
-    RETURN_IF_FAILED(filterImage());
+    RETURN_IF_FAILED(filterImage(proc_file_name));
 
   RETURN_NO_ERR;
 }
@@ -93,7 +92,7 @@ lfError cLightFieldCore::loadProcImage(const char* file_name)
   RETURN_NO_ERR;
 }
 
-lfError  cLightFieldCore::filterImage()
+lfError  cLightFieldCore::filterImage(const char* file_name)
 {
   RETURN_IF_NULL(p->_white_img && p->_raw_img);
   p->deleteProcImage();
@@ -102,6 +101,9 @@ lfError  cLightFieldCore::filterImage()
 
   cvDiv(p->_raw_img, p->_white_img, p->_proc_img);
   cvScale(p->_proc_img, p->_proc_img, 255);
+  p->_img = p->_proc_img;
+  if(file_name)
+    RETURN_IF_FAILED(saveImage(file_name, p->_img));
   RETURN_NO_ERR;
 }
 
@@ -161,8 +163,10 @@ lfError cLightFieldCore::renderView(lfViewGeneratorType_t type)
   if(p->_view_generator == NULL)
     p->_view_generator = p->_view_generator_factory->create(type);  
   RETURN_IF_NULL(p->_view_generator);
-  if(NULL == p->_view_generator->getView())
-    RETURN_IF_FAILED(p->_view_generator->generate(p->_img, p->_depth_generator->getDepthImage(), &p->_calib->getParameters(p->_img)));
+  if(NULL == p->_view_generator->getView()) {
+    lfViewGeneratorParameter_t vparams;
+    RETURN_IF_FAILED(p->_view_generator->generate(p->_img, p->_depth_generator->getDepthImage(), &p->_calib->getParameters(p->_img), &vparams));
+  }
   RETURN_NO_ERR;
 }
 
@@ -182,6 +186,7 @@ lfError cLightFieldCore::saveCalibImage(const char* file_name)
   IplImage* img = (IplImage*) createCalibImage();
   RETURN_IF_NULL(img);
   RETURN_IF_FAILED(saveImage(file_name, img));
+  cvReleaseImage(&img);
   RETURN_NO_ERR;
 }
 
@@ -189,7 +194,9 @@ void* cLightFieldCore::createCalibImage()
 {
   if(!p->_img)
     return NULL;
-  void* img = cvCloneImage(p->_img);
+  IplImage *my_img = (IplImage*) p->_img;
+  IplImage* img = CREATE_IMAGE(my_img);
+  cvCopy(my_img, img);
   if(!img)
     return NULL;
   if(LF_NO_ERR != p->_calib->drawLenses(img, 1, p->_calib->getParameters(p->_img).lens_type_nums))
@@ -203,7 +210,6 @@ void* cLightFieldCore::createCalibImage()
 lfError cLightFieldCore::saveImage(const char* file_name, void* img)
 {
   int ret = cvSaveImage(file_name, img);
-  cvReleaseImage((IplImage**)&img);
 
   if(ret == 0)
     return LF_ERR;
@@ -212,29 +218,29 @@ lfError cLightFieldCore::saveImage(const char* file_name, void* img)
 }
 
 ////////////////////// LENS IMAGE HANDLING /////////////////////////
-#define EXTRACT_FROM_DEPTH
 
-lfError cLightFieldCore::saveLensImages(const char* folder_name)
+lfError cLightFieldCore::saveLensImages(const char* folder_name, bool from_depth_image)
 {
   RETURN_IF_NULL(folder_name);
-#ifdef EXTRACT_FROM_DEPTH
-  IplImage* depth = (IplImage*) p->_depth_generator->getDepthImage();
-  IplImage* depth_converted = cvCreateImage(cvSize(depth->width, depth->height), IPL_DEPTH_16U, 1);
-  CvScalar vd, vd_new;
-  for(int y=0; y<depth->height; y++) {
-    for(int x=0; x<depth->width; x++) {
-      vd = cvGet2D(depth, y, x);
-      vd_new.val[0] = (1 + 1/vd.val[0]) * 65535;
-      cvSet2D(depth_converted, y, x, vd_new);
+  
+  const char* type;
+  if(from_depth_image) {
+    IplImage* depth = (IplImage*) p->_depth_generator->getDepthImage();
+    IplImage* depth_converted = cvCreateImage(cvSize(depth->width, depth->height), IPL_DEPTH_16U, 1);
+    CvScalar vd, vd_new;
+    for(int y=0; y<depth->height; y++) {
+      for(int x=0; x<depth->width; x++) {
+        vd = cvGet2D(depth, y, x);
+        vd_new.val[0] = (1 + 1/vd.val[0]) * 65535;
+        cvSet2D(depth_converted, y, x, vd_new);
+      }
     }
+    type = "depth";
+    RETURN_IF_FAILED(extractLensImages(depth_converted));
+  } else {
+    type = "img";
+    RETURN_IF_FAILED(extractLensImages(p->_img));
   }
-  showImage(depth_converted, "Depth converted");
-  RETURN_IF_FAILED(extractLensImages(depth_converted));
-  const char* type = "depth";
-#else
-  const char* type = "img";
-  RETURN_IF_FAILED(extractLensImages(p->_img));
-#endif
 
   int lens_num = 1;
   int lens_type_num = 1;
@@ -340,6 +346,7 @@ lfError cLightFieldCore::getLensImage(int lens_num, int lens_type, const void* c
 
   cvSetImageROI(full, roi);
   cvCopy(full, img, mask);
+  cvResetImageROI(img);
 
   RETURN_NO_ERR;
 }
